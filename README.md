@@ -200,11 +200,15 @@ y_probs = best_model.predict_proba(X_test_scaler)[:, 1] if hasattr(best_model, "
 </br>
 
 **1) 모델 성능 평가**
+
+</br>
 각 모델의 성능은 교차 검증을 통해 검토되었으며, 주요 평가지표인 **정확도(Accuracy)**, **정밀도(Precision)**, **재현율(Recall)**, **F1 점수** 및 **ROC-AUC**를 기준으로 평가하였습니다.
 
 </br>
 
 **2) 모델링**
+
+</br>
 로지스틱 회귀(Logistic Regression), 결정 트리(Decision Tree), 랜덤 포레스트(Random Forest), 그래디언트 부스팅(Gradient Boosting), XGBoost 등 다양한 모델이 실험되었습니다.
 - **로지스틱 회귀(Logistic Regression)**
   - 모델 결과: [모델 결과 삽입]
