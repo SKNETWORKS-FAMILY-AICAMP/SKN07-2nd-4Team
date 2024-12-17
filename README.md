@@ -164,7 +164,7 @@ X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.
 <br>
 
  ▶ 모델 훈련
- #### ✔ Machine Learning
+ ## Machine Learning
 
 ``` python
 # 모델 정의
