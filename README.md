@@ -260,6 +260,153 @@ def go_train(select_model,model_name):
 ```
 </br>
 
+## Deep Learning
+
+``` python
+import torch
+from torch.utils.data import DataLoader, TensorDataset
+
+train_dataset = torch.utils.data.TensorDataset(torch.tensor( X_train, dtype=torch.float32).to('cuda:0'), 
+                                               torch.tensor( y_train.to_numpy(), dtype=torch.float32).to('cuda:0'))
+test_dataset  = torch.utils.data.TensorDataset(torch.tensor( X_test,  dtype=torch.float32).to('cuda:0'), 
+                                               torch.tensor( y_test.to_numpy(), dtype=torch.float32).to('cuda:0'))
+
+BATCH_SIZE = 32
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+
+class ChurnModel(nn.Module):
+    def __init__(self, input_size):
+        super(ChurnModel,self).__init__()
+        self.fc1   = nn.Linear(input_size, 1024)
+        self.fc2   = nn.Linear(1024, 1024)
+        self.fc3   = nn.Linear(1024, 512)
+        self.fc4   = nn.Linear(512, 512)
+        self.fc5   = nn.Linear(512, 1)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = F.leaky_relu(x)
+        x = self.fc2(x)
+        x = F.leaky_relu(x)
+        x = self.fc3(x)
+        x = F.leaky_relu(x)
+        x = self.fc4(x)
+        x = F.leaky_relu(x)
+        x = self.fc5(x)
+        x = torch.sigmoid(x)
+
+        return x
+
+class ChurnModel2(nn.Module):
+    def __init__(self, input_size):
+        super(ChurnModel2,self).__init__()
+        self.input_size = input_size
+
+        self.fc1_1   = nn.Linear(input_size//3, 512)
+        self.fc1_2   = nn.Linear(input_size//3, 512)
+        self.fc1_3   = nn.Linear(input_size//3 + input_size%3, 512)
+
+        self.fc2_1   = nn.Linear(512, 512)
+        self.fc2_2   = nn.Linear(512, 512)
+        self.fc2_3   = nn.Linear(512, 512)
+
+        self.fc3   = nn.Linear(512 * 3, 256)
+        # self.fc4   = nn.Linear(256, 64)
+     
+        self.fc5   = nn.Linear(256, 1)
+
+    def forward(self, x):
+        d_ = self.input_size//3
+        x1 = x[:, :d_]
+        x2 = x[:, d_:d_ *2]
+        x3 = x[:, d_*2:]
+
+        x1 = self.fc1_1(x1)
+        x1 = F.leaky_relu(x1)
+        x2 = self.fc1_2(x2)
+        x2 = F.leaky_relu(x2)
+        x3 = self.fc1_3(x3)
+        x3 = F.leaky_relu(x3)
+
+        x1 = self.fc2_1(x1)
+        x1 = F.leaky_relu(x1)
+        x2 = self.fc2_2(x2)
+        x2 = F.leaky_relu(x2)
+        x3 = self.fc2_3(x3)
+        x3 = F.leaky_relu(x3)
+
+        x4 = torch.cat((x1, x2, x3), dim=1)
+        # print(x1.shape, x2.shape, x3.shape, x4.shape)
+        
+        x4 = self.fc3(x4)
+        x4 = F.leaky_relu(x4)
+
+        # x4 = self.fc4(x4)
+        # x4 = F.leaky_relu(x4)
+  
+        x4 = self.fc5(x4)
+        x4 = torch.sigmoid(x4)
+
+        return x4
+
+ef train(model, train_loader, optimizer, loss_fn):
+    model.train()
+    total_acc, total_loss = 0, 0
+    for X, y in train_loader:
+        optimizer.zero_grad()
+        preds = model(X)
+        # display(preds, y)
+        loss = loss_fn(preds, y.reshape(-1,1))
+        loss.backward()
+        optimizer.step()
+
+        total_acc += ((preds>=0.5).float() ==  y.reshape(-1,1)).float().sum().item()
+        total_loss += loss.item()*y.size(0)
+        # print(f'total_loss = {total_loss}, total_acc={total_acc}')
+    return total_acc/len(train_loader.dataset), total_loss/len(train_loader.dataset)
+
+def evaluate(model, test_loader, loss_fn):
+    model.eval()
+    total_acc, total_loss = 0, 0
+
+    with torch.no_grad():   # torch를 변경하지 마라. 테스트 동안
+        for X, y in test_loader:
+            preds = model(X)
+            loss = loss_fn(preds, y.reshape(-1,1))
+
+            total_acc += ((preds>=0.5).float() ==  y.reshape(-1,1)).float().sum().item()
+            total_loss += loss.item()*y.size(0)
+
+    return total_acc/len(test_loader.dataset), total_loss/len(test_loader.dataset)
+
+num_epochs = 10
+
+torch.manual_seed(1)
+
+def learning(num_epochs,model, train_loader, test_loader, optimizer, loss_fn):
+    for epoch in range(num_epochs):
+        acc_train, loss_train = train(model, train_loader, optimizer, loss_fn)
+        acc_valid, loss_valid = evaluate(model, test_loader, loss_fn)
+        print(f'에포크 {epoch} 정확도: {acc_train:.4f} 검증 정확도: {acc_valid:.4f} \
+            훈련 Loss: {loss_train:.4f} 검증 Loss: {loss_valid:.4f}')
+    #     break
+
+loss_fns = {'BCELoss': nn.BCELoss(), 
+            'HingeEmbeddingLoss': nn.HingeEmbeddingLoss(), 
+            'BCEWithLogitsLoss': nn.BCEWithLogitsLoss() }
+
+models = {'ChurnModel' : ChurnModel(train_dataset[0][0].__len__()), 
+          'ChurnModel2': ChurnModel2(train_dataset[0][0].__len__())}
+for model_name, model in models.items():
+    model.to('cuda:0')
+    print(f'{"*"*20} {model_name} {"*"*20}')
+    for fn_name, loss_fn in loss_fns.items():
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+        print(f'{"-"*15} {fn_name} {"-"*15}')
+        learning(num_epochs, model, train_loader, test_loader, optimizer, loss_fn)
+
+
 ### 5. 프로젝트 결과
 
 </br>
@@ -315,6 +462,9 @@ def go_train(select_model,model_name):
 - ROC-AUC : [결과 설명]
 
 </br>
+
+<img width="469" alt="image" src="https://github.com/user-attachments/assets/e1690d1f-76e2-421e-861d-d62c43052298" />
+<img width="478" alt="image" src="https://github.com/user-attachments/assets/e956f1d3-0b2e-4e52-9726-600371a77052" />
 
 
 ### 6. 팀원 회고
