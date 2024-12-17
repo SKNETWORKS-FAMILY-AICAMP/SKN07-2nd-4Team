@@ -90,7 +90,7 @@
  <img width="500px" height="1000" src="image/columns.png" />
 
 <br><br>
-
+ 
  (3) 데이터 전처리 
  
 <br><br><br>▶ 결측치 제거 
@@ -101,7 +101,7 @@ df_all.isnull().sum()
 
 <img width="300" alt="image" src="https://github.com/user-attachments/assets/1517f21a-2fb1-407d-92e8-a906499c8d39" /> <img width="300" alt="image" src="https://github.com/user-attachments/assets/487f1ed0-9284-48ba-9739-59bf24bbd03f" />
 
-<br>▶ 라벨값(Churn) object -> int 변경 
+<br>▶ 라벨값(Churn) object --> int 변경 
 ``` python
 churn_label = {'No': 0.0, 'Yes': 1.0} # 유지 0, 이탈 1
 df_all['Churn'] = df_all['Churn'].map(churn_label)
@@ -116,7 +116,6 @@ np.unique(df_all['Churn'], return_counts=True)
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/e7e47fef-2fb2-47bc-aefc-48eaae314849" />
 
 <br>
- (4) 모델링 
 
  ▶ 모델 훈련에 사용할 컬럼만 선택하여 X,y 데이터 생성 및 인코딩
  ``` python
@@ -126,73 +125,135 @@ np.unique(df_all['Churn'], return_counts=True)
 # 이탈율
 y_data = df_all['Churn']
 
-# object 타입 컬럼 확인 
-X_data[X_data.select_dtypes(include=['object']).columns]
+``` python
+    
+    # one-hot 인코딩 
+    if 'PrizmCode' in df_file.columns:
+        df_file = pd.get_dummies(df_file, columns=['PrizmCode'],drop_first=False)
+    if 'Occupation' in df_file.columns:
+        df_file = pd.get_dummies(df_file, columns=['Occupation'],drop_first=False)
+    if 'MaritalStatus' in df_file.columns:
+        df_file = pd.get_dummies(df_file, columns=['MaritalStatus'],drop_first=False)
+    
+    # 숫자자 값중 Unknown -> -1 , 나머지는 숫자로 형변환환
+    def label_handset_price(value):
+        if value == 'Unknown':
+            return -1  # Unknown 값을 -1로 라벨링
+            # return np.nan  # Unknown 값을 NaN으로 처리 (XGBoost사용)
+        else:
+            return int(value)  # 나머지는 숫자로 변환
+    if df_file['HandsetPrice'].dtype == 'object':
+        df_file['HandsetPrice'] = df_file['HandsetPrice'].apply(label_handset_price)
 
-# object 타입 unique 값 확인 
-print(f'NewCellphoneUser : {X_data.NewCellphoneUser.unique(),} \n\
-NotNewCellphoneUser : {X_data.NotNewCellphoneUser.unique(),}  \n\
-MadeCallToRetentionTeam : {X_data.MadeCallToRetentionTeam.unique(),} \n\
-CreditRating : {X_data.CreditRating.unique(),} \n\
-HandsetRefurbished : {X_data.HandsetRefurbished.unique(),} \n\
-PrizmCode : {X_data.PrizmCode.unique(),} \n\
-Occupation : {X_data.Occupation.unique(),}  \n\
-MaritalStatus : {X_data.MaritalStatus.unique(),}  \n\
-ChildrenInHH : {X_data.ChildrenInHH.unique(),} \n\
-HandsetPrice : {X_data.HandsetPrice.unique()} ')
- ```
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/f785e583-26cd-41e8-8eb4-b52332f77377" />
-
+    return df_file
+```
 <br><br>
 
- (4) 모델링 \
+ (4) 모델링 
+ 
  ▶ 데이터셋 분리
- 1. 입력 데이터와 타겟 데이터로 분리
- 2. 훈련 데이터셋과 테스트 데이터셋으로 분리
- 3. 훈련 데이터셋과 테스트 데이터셋의 타겟 분포가 적절한지 확인
-
--------------------------------------
+``` python
+X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, random_state=42)
+```
+</br>
 
 ## Machine Learning
-### 1. gradient_boosting_classifier 
+
+▶ 데이터셋 분리
+▶ 모델 훈련
+
 ``` python
- params = {
-        "n_estimators": [10, 50, 100, 200, 300],  # 모델 생성 트리 개수
-        "learning_rate": [0.1],                   # 학습률
-        "max_depth": [1, 2, 3, 4, 5],             # 트리 최대 깊이
-        "subsample": [0.5, 0.7],                  # sample rate
+# 모델 정의
+models = {
+    "Logistic Regression": LogisticRegression(),
+    "Decision Tree": DecisionTreeClassifier(),
+    "Random Forest": RandomForestClassifier(class_weight='balanced'),
+    "Gradient Boosting": GradientBoostingClassifier(),
+    "XGBoost": XGBClassifier(learning_rate=0.1, max_depth=4, n_estimators=100),
+    "SGDClassifier": SGDClassifier(loss='hinge'),
+    "KNN": KNeighborsClassifier()
 }
 
-model = GradientBoostingClassifier()
-model.fit(X_train_scaler, y_train)
+# Stratified K-Fold 설정
+skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+# NumPy 배열로 변환 
+X_resampled = X_resampled.to_numpy() if isinstance(X_resampled, pd.DataFrame) else X_resampled
+y_resampled = y_resampled.to_numpy() if isinstance(y_resampled, pd.Series) else y_resampled
 
-#GridSearchCV 사용 (교차 검증을 통한 하이퍼파라미터 최적화)
-grid_search = GridSearchCV(
-    estimator=model,          
-    param_grid=params,  
-    scoring='accuracy',
-    refit='accuracy',
-    cv=5,             
-    n_jobs=-1,         
-)
+# 모델 훈련 및 평가
+results = {}
+for name, model in models.items():
+    print(f"Model: {name}")
+    fold_accuracies = []
+    fold_roc_aucs = []
 
-grid_search.fit(X_train_scaler, y_train)
+    for train_idx, val_idx in skf.split(X_resampled, y_resampled):
+        if name in ["Decision Tree", "Random Forest", "Gradient Boosting", "XGBoost"]:
+            X_fold_train, X_fold_val = X_resampled[train_idx], X_resampled[val_idx]
+        else:
+            X_fold_train, X_fold_val = X_train_scaler[train_idx], X_train_scaler[val_idx]
 
-best_param_ = grid_search.best_params_
-best_model = grid_search.best_estimator_ 
+        y_fold_train, y_fold_val = y_resampled[train_idx], y_resampled[val_idx]
+        
+        model.fit(X_fold_train, y_fold_train)
+        y_preds = model.predict(X_fold_val)
+        y_probs = model.predict_proba(X_fold_val)[:, 1] if hasattr(model, "predict_proba") else None
+        
+        acc = accuracy_score(y_fold_val, y_preds)
+        roc_auc = roc_auc_score(y_fold_val, y_probs) if y_probs is not None else None
+        fold_accuracies.append(acc)
+        if roc_auc is not None:
+            fold_roc_aucs.append(roc_auc)
 ```
 
-# 최적의 하이퍼파라미터 출력
-print("Best Parameters:", best_param_)
-print("Best models:", best_model)
 
-y_preds = best_model.predict(X_test_scaler)
-y_probs = best_model.predict_proba(X_test_scaler)[:, 1] if hasattr(best_model, "predict_proba") else None
+▶ 모델 성능 개선
+``` python
+# 튜닝을 위한 공통 부분 작성 (위와 중복되는 부분 있음)
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from xgboost import XGBClassifier
+from sklearn.metrics import accuracy_score, roc_auc_score
+from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
 
-2. logistic_regression
-3. random_forest_classifier
-4. xgb_classifier
+X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, random_state=42)
 
+# 불균형 데이터 처리
+sm = SMOTE(random_state=42)
+X_resampled, y_resampled = sm.fit_resample(X_train, y_train)
+
+# NumPy 배열로 변환
+
+# 교차검증 
+skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+# 학습 및 평가 함수
+def go_train(select_model,model_name):
+    accuracies = []
+    roc_aucs = []
+
+    # 교차검증 
+    for train_idx, val_idx in skf.split(X_resampled, y_resampled):
+    
+        # 교차검증용 훈련 세트와 검증 세트 분리
+
+        # 모델 학습 
+        select_model.fit(X_train, y_train)
+
+        # 검증 세트 평가
+        y_val_pred = select_model.predict(X_val)
+        y_val_prob = select_model.predict_proba(X_val)[:, 1]
+        accuracies.append(accuracy_score(y_val, y_val_pred))
+        roc_aucs.append(roc_auc_score(y_val, y_val_prob))
+
+    # 테스트 세트
+    select_model.fit(X_resampled, y_resampled)  # 전체 훈련 데이터로 재학습
+    y_test_pred = select_model.predict(X_test)
+    y_test_prob = select_model.predict_proba(X_test)[:, 1]
+    test_acc = accuracy_score(y_test, y_test_pred)
+    test_roc_auc = roc_auc_score(y_test, y_test_prob)
+```
 </br>
 
 ### 5. 프로젝트 결과
