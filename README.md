@@ -164,7 +164,7 @@ X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.
 <br>
 
  ▶ 모델 훈련
- ## Machine Learning
+ #### ✔ Machine Learning
 
 ``` python
 # 모델 정의
@@ -260,7 +260,7 @@ def go_train(select_model,model_name):
 ```
 </br>
 
-## Deep Learning
+#### ✔ Deep Learning
 
 ``` python
 import torch
@@ -350,7 +350,7 @@ class ChurnModel2(nn.Module):
 
         return x4
 
-ef train(model, train_loader, optimizer, loss_fn):
+def train(model, train_loader, optimizer, loss_fn):
     model.train()
     total_acc, total_loss = 0, 0
     for X, y in train_loader:
@@ -370,7 +370,7 @@ def evaluate(model, test_loader, loss_fn):
     model.eval()
     total_acc, total_loss = 0, 0
 
-    with torch.no_grad():   # torch를 변경하지 마라. 테스트 동안
+    with torch.no_grad():  
         for X, y in test_loader:
             preds = model(X)
             loss = loss_fn(preds, y.reshape(-1,1))
@@ -405,7 +405,8 @@ for model_name, model in models.items():
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         print(f'{"-"*15} {fn_name} {"-"*15}')
         learning(num_epochs, model, train_loader, test_loader, optimizer, loss_fn)
-
+```
+<br><br>
 
 ### 5. 프로젝트 결과
 
