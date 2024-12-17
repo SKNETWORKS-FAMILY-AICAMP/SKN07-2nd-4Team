@@ -66,15 +66,34 @@
  <br>Target : Yes(1) : No(0) = 1 : 4
  <br>출처 : Kaggle (https://www.kaggle.com/datasets/jpacse/datasets-for-churn-telecom/data?select=cell2celltrain.csv)
 
-<br>
+<br><br>
 
- (2) Column 정보 확인
- >58개의 Column 중 고객의 이탈여부와 관련성이 높은 컬럼끼리 DataFrame을 분리하여 상관관계 시각화
+ (2) EDA
+ >58개의 Column을 6개의 DataFrame으로 분리하여 Heatmap 시각화
+ <br>
+ <img width="400px" src="image/billing_usage_heatmap.png" />
+ <img width="400px" src="image/call_stats_heatmap.png" /> 
+ <img width="400px" src="image/customer_churn_heatmap.png" /> 
+ <img width="450px" src="image/customer_lifestyle_heatmap.png" /> 
+ <img width="400px" src="image/customer_profile_heatmap.png" /> 
+ <img width="400px" src="image/handset_details_heatmap.png" /> 
+ <br>
+ 
+<br><br>
 
-<br>
+ >Feature 중요도 순위에 따라 상위 40개 항목을 추출하여 훈련 데이터로 사용
+ <img width="900px" height="700" src="image/feature_importance.png" />
 
- (3) 데이터 전처리 과정 
-<br>
+<br><br>
+
+ >상위 40개 항목 Column 정보 확인
+ <img width="500px" height="1000" src="image/columns.png" />
+
+<br><br>
+
+ (3) 데이터 전처리 
+ 
+<br><br>
 
 
  (4) 모델링 \
