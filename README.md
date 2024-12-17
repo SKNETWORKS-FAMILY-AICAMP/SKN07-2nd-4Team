@@ -58,7 +58,7 @@
 </br>
 
 ### 4. 프로젝트 과정
- - Dataset 준비
+ (1) Dataset 준비
  > Telecom Churn : 13.37MB
  <br>dtypes: float64(26), int64(9), object(23)
  <br>RangeIndex: 51047 entries, 0 to 51046
@@ -68,13 +68,62 @@
 
 <br>
 
- - Column 정보 확인
+ (2) Column 정보 확인
  >58개의 Column 중 고객의 이탈여부와 관련성이 높은 컬럼끼리 DataFrame을 분리하여 상관관계 시각화
 
 <br>
 
- - 데이터 전처리 과정 
+ (3) 데이터 전처리 과정 
 <br>
+
+
+ (4) 모델링 \
+ ▶ 데이터셋 분리
+ 1. 입력 데이터와 타겟 데이터로 분리
+ 2. 훈련 데이터셋과 테스트 데이터셋으로 분리
+ 3. 훈련 데이터셋과 테스트 데이터셋의 타겟 분포가 적절한지 확인
+
+-------------------------------------
+
+## Machine Learning
+### 1. gradient_boosting_classifier 
+``` python
+ params = {
+        "n_estimators": [10, 50, 100, 200, 300],  # 모델 생성 트리 개수
+        "learning_rate": [0.1],                   # 학습률
+        "max_depth": [1, 2, 3, 4, 5],             # 트리 최대 깊이
+        "subsample": [0.5, 0.7],                  # sample rate
+}
+
+model = GradientBoostingClassifier()
+model.fit(X_train_scaler, y_train)
+
+#GridSearchCV 사용 (교차 검증을 통한 하이퍼파라미터 최적화)
+grid_search = GridSearchCV(
+    estimator=model,          
+    param_grid=params,  
+    scoring='accuracy',
+    refit='accuracy',
+    cv=5,             
+    n_jobs=-1,         
+)
+
+grid_search.fit(X_train_scaler, y_train)
+
+best_param_ = grid_search.best_params_
+best_model = grid_search.best_estimator_ 
+```
+
+# 최적의 하이퍼파라미터 출력
+print("Best Parameters:", best_param_)
+print("Best models:", best_model)
+
+y_preds = best_model.predict(X_test_scaler)
+y_probs = best_model.predict_proba(X_test_scaler)[:, 1] if hasattr(best_model, "predict_proba") else None
+
+2. logistic_regression
+3. random_forest_classifier
+4. xgb_classifier
 
 ### 5. 프로젝트 결과 
 
