@@ -464,7 +464,7 @@ for model_name, model in models.items():
 
 각 모델의 성능은 교차 검증을 통해 검토되었으며, 주요 평가지표인 **정확도(Accuracy)**, **ROC-AUC**를 기준으로 평가하였을때 가장 높은 점수가 나왔던 XGBoost 모델을 선택하여 결과를 분석하였습니다.
 
-![image](https://github.com/user-attachments/assets/7f43db05-c8dd-4bc5-884d-5ac75ed9db19)
+<img width="491" alt="image" src="https://github.com/user-attachments/assets/5e5c5dfa-0b81-4481-a154-d350d9cc1d76" />
 
 교차검증 Mean Accuracy: 0.8048
 - 평균 **80.48**%의 정확도를 기록하며, 전체 모델 중에서 가장 높은 정확도를 보였습니다. 이는 모델이 고객 이탈 예측 문제에서 상당히 안정적인 성능을 보였다는 것을 의미합니다.
