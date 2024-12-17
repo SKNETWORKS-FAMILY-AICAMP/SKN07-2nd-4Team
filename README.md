@@ -60,19 +60,31 @@
 
 </br>
 
-### 4. EDA 
+### 4. 프로젝트 과정
+ - Dataset 준비
+ > Telecom Churn : 13.37MB
+ <br>dtypes: float64(26), int64(9), object(23)
+ <br>RangeIndex: 51047 entries, 0 to 51046
+ <br>Data columns : total 58 columns
+ <br>Target : Yes(1) : No(0) = 1 : 4
+ <br>출처 : Kaggle (https://www.kaggle.com/datasets/jpacse/datasets-for-churn-telecom/data?select=cell2celltrain.csv)
+
+<br>
+
+ - Column 정보 확인
+ >58개의 Column 중 고객의 이탈여부와 관련성이 높은 컬럼끼리 DataFrame을 분리하여 상관관계 시각화
+
+<br>
+
+ - 데이터 전처리 과정 
+<br>
+
+### 5. 프로젝트 결과 
 
 </br>
 
-### 5. 데이터 전처리 과정
 
-</br>
-
-### 6. Machine Learing Model
-
-</br>
-
-### 7. 팀원 회고
+### 6. 팀원 회고
 김성근
 >
 >
