@@ -14,6 +14,8 @@
         <img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=Python&logoColor=white"/>
         <img src="https://img.shields.io/badge/Machine%20Learning-FF6F00?style=flat&logo=Artificial%20Intelligence&logoColor=white"/>
         <img src="https://img.shields.io/badge/scikit--learn-F7931E?style=flat&logo=scikit-learn&logoColor=white"/>
+        <img src="https://img.shields.io/badge/Deep%20Learning-FCFC00?style=flat&logo=Artificial%20Intelligence&logoColor=white"/>
+        <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat&logo=PyTorch&logoColor=white">
         <br/>
         <img src="https://img.shields.io/badge/Git-F05032?style=flat&logo=Git&logoColor=white"/>
         <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white"/>
@@ -74,7 +76,7 @@
  <img width="400px" src="image/billing_usage_heatmap.png" />
  <img width="400px" src="image/call_stats_heatmap.png" /> 
  <img width="400px" src="image/customer_churn_heatmap.png" /> 
- <img width="450px" src="image/customer_lifestyle_heatmap.png" /> 
+ <img width="400px" src="image/customer_lifestyle_heatmap.png" /> 
  <img width="400px" src="image/customer_profile_heatmap.png" /> 
  <img width="400px" src="image/handset_details_heatmap.png" /> 
  <br>
@@ -93,40 +95,43 @@
  
  (3) 데이터 전처리 
  
-<br><br><br>▶ 결측치 제거 
+▶ 결측치 제거 
 ``` python
 df_all = train_file.dropna().copy()
 df_all.isnull().sum()
 ```
 
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/1517f21a-2fb1-407d-92e8-a906499c8d39" /> <img width="300" alt="image" src="https://github.com/user-attachments/assets/487f1ed0-9284-48ba-9739-59bf24bbd03f" />
+<img width="250" alt="image" src="https://github.com/user-attachments/assets/1517f21a-2fb1-407d-92e8-a906499c8d39" /> <img width="250" alt="image" src="https://github.com/user-attachments/assets/487f1ed0-9284-48ba-9739-59bf24bbd03f" />
+<br><br>
 
-<br>▶ 라벨값(Churn) object --> int 변경 
+  ▶ 라벨값(Churn) object --> int 변경 
 ``` python
 churn_label = {'No': 0.0, 'Yes': 1.0} # 유지 0, 이탈 1
 df_all['Churn'] = df_all['Churn'].map(churn_label)
 df_all
 ```
 
-<br>▶ 라벨값(Churn) 비율 확인
+<br><br>
+  ▶ 라벨값(Churn) 비율 확인
 ``` python
 import numpy as np
 np.unique(df_all['Churn'], return_counts=True)
 ```
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/e7e47fef-2fb2-47bc-aefc-48eaae314849" />
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/e7e47fef-2fb2-47bc-aefc-48eaae314849" />
 
-<br>
-
- ▶ 모델 훈련에 사용할 컬럼만 선택하여 X,y 데이터 생성 및 인코딩
- ``` python
+<br><br>
+  ▶ 모델 훈련에 사용할 컬럼만 선택하여 x_data,y_data 생성
+``` python
  # 상관 계수가 높은 컬럼을 선택
  X_data = df_all[['CustomerID','MonthlyRevenue','MonthlyMinutes','TotalRecurringCharge','OverageMinutes','RoamingCalls','PercChangeMinutes','PercChangeRevenues','MonthsInService','RetentionCalls','RetentionOffersAccepted','NewCellphoneUser','NotNewCellphoneUser','ReferralsMadeBySubscriber','AdjustmentsToCreditRating','MadeCallToRetentionTeam','CreditRating','PeakCallsInOut','OffPeakCallsInOut','ReceivedCalls','UnansweredCalls','OutboundCalls','DroppedBlockedCalls','DroppedCalls','InboundCalls','BlockedCalls','DirectorAssistedCalls','CustomerCareCalls','CallWaitingCalls','CurrentEquipmentDays','HandsetRefurbished','IncomeGroup','PrizmCode','Occupation','MaritalStatus','HandsetModels','AgeHH1','ChildrenInHH','HandsetPrice','ThreewayCalls','Handsets']].copy()
 
 # 이탈율
 y_data = df_all['Churn']
+```
 
+<br><br>
+ ▶ One-Hot 인코딩 
 ``` python
-    
     # one-hot 인코딩 
     if 'PrizmCode' in df_file.columns:
         df_file = pd.get_dummies(df_file, columns=['PrizmCode'],drop_first=False)
@@ -135,7 +140,7 @@ y_data = df_all['Churn']
     if 'MaritalStatus' in df_file.columns:
         df_file = pd.get_dummies(df_file, columns=['MaritalStatus'],drop_first=False)
     
-    # 숫자자 값중 Unknown -> -1 , 나머지는 숫자로 형변환환
+    # Unknown -> -1 , 나머지는 숫자로 형 변환
     def label_handset_price(value):
         if value == 'Unknown':
             return -1  # Unknown 값을 -1로 라벨링
@@ -147,6 +152,7 @@ y_data = df_all['Churn']
 
     return df_file
 ```
+
 <br><br>
 
  (4) 모델링 
@@ -155,12 +161,10 @@ y_data = df_all['Churn']
 ``` python
 X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, random_state=42)
 ```
-</br>
+<br>
 
-## Machine Learning
-
-▶ 데이터셋 분리
-▶ 모델 훈련
+ ▶ 모델 훈련
+ #### ✔ Machine Learning
 
 ``` python
 # 모델 정의
@@ -205,7 +209,7 @@ for name, model in models.items():
         if roc_auc is not None:
             fold_roc_aucs.append(roc_auc)
 ```
-
+<br>
 
 ▶ 모델 성능 개선
 ``` python
