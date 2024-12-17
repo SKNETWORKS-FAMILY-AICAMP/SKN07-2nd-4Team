@@ -1,6 +1,10 @@
 # SKN07-2nd-4Team 
 
-> **팀원 : 김성근, 대성원, 유수현, 윤정연, 정승연**
+| <img src="https://github.com/user-attachments/assets/22cb2889-09be-4a6d-9270-c7e5c01dfc16"  width="200" height="200"/>  | <img src="https://github.com/user-attachments/assets/3b292ba1-a829-474e-98e5-d073a7a462e1"  width="200" height="200"/>  | <img src="https://github.com/user-attachments/assets/c0684921-694d-40d8-b43c-cff0a77b03fd"  width="200" height="200"/>  |  <img src="https://github.com/user-attachments/assets/ca13d3a3-2d3e-4326-845c-43ae64829985"  width="200" height="200"/>  | <img src ="https://github.com/user-attachments/assets/4fea9ba2-e2cc-4533-a8b1-4b0b47d30448" width="200" height="200"/>  |
+|:----------:|:----------:|:----------:|:----------:|:----------:|
+| 김성근 | 대성원 | 유수현 | 윤정연 | 정승연 |
+
+
 </br>
 
 <div align="center">
