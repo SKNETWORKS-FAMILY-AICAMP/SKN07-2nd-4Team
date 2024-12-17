@@ -93,8 +93,57 @@
 
  (3) 데이터 전처리 
  
-<br><br>
+<br><br><br>▶ 결측치 제거 
+``` python
+df_all = train_file.dropna().copy()
+df_all.isnull().sum()
+```
 
+<img width="300" alt="image" src="https://github.com/user-attachments/assets/1517f21a-2fb1-407d-92e8-a906499c8d39" /> <img width="300" alt="image" src="https://github.com/user-attachments/assets/487f1ed0-9284-48ba-9739-59bf24bbd03f" />
+
+<br>▶ 라벨값(Churn) object -> int 변경 
+``` python
+churn_label = {'No': 0.0, 'Yes': 1.0} # 유지 0, 이탈 1
+df_all['Churn'] = df_all['Churn'].map(churn_label)
+df_all
+```
+
+<br>▶ 라벨값(Churn) 비율 확인
+``` python
+import numpy as np
+np.unique(df_all['Churn'], return_counts=True)
+```
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/e7e47fef-2fb2-47bc-aefc-48eaae314849" />
+
+<br>
+ (4) 모델링 
+
+ ▶ 모델 훈련에 사용할 컬럼만 선택하여 X,y 데이터 생성 및 인코딩
+ ``` python
+ # 상관 계수가 높은 컬럼을 선택
+ X_data = df_all[['CustomerID','MonthlyRevenue','MonthlyMinutes','TotalRecurringCharge','OverageMinutes','RoamingCalls','PercChangeMinutes','PercChangeRevenues','MonthsInService','RetentionCalls','RetentionOffersAccepted','NewCellphoneUser','NotNewCellphoneUser','ReferralsMadeBySubscriber','AdjustmentsToCreditRating','MadeCallToRetentionTeam','CreditRating','PeakCallsInOut','OffPeakCallsInOut','ReceivedCalls','UnansweredCalls','OutboundCalls','DroppedBlockedCalls','DroppedCalls','InboundCalls','BlockedCalls','DirectorAssistedCalls','CustomerCareCalls','CallWaitingCalls','CurrentEquipmentDays','HandsetRefurbished','IncomeGroup','PrizmCode','Occupation','MaritalStatus','HandsetModels','AgeHH1','ChildrenInHH','HandsetPrice','ThreewayCalls','Handsets']].copy()
+
+# 이탈율
+y_data = df_all['Churn']
+
+# object 타입 컬럼 확인 
+X_data[X_data.select_dtypes(include=['object']).columns]
+
+# object 타입 unique 값 확인 
+print(f'NewCellphoneUser : {X_data.NewCellphoneUser.unique(),} \n\
+NotNewCellphoneUser : {X_data.NotNewCellphoneUser.unique(),}  \n\
+MadeCallToRetentionTeam : {X_data.MadeCallToRetentionTeam.unique(),} \n\
+CreditRating : {X_data.CreditRating.unique(),} \n\
+HandsetRefurbished : {X_data.HandsetRefurbished.unique(),} \n\
+PrizmCode : {X_data.PrizmCode.unique(),} \n\
+Occupation : {X_data.Occupation.unique(),}  \n\
+MaritalStatus : {X_data.MaritalStatus.unique(),}  \n\
+ChildrenInHH : {X_data.ChildrenInHH.unique(),} \n\
+HandsetPrice : {X_data.HandsetPrice.unique()} ')
+ ```
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/f785e583-26cd-41e8-8eb4-b52332f77377" />
+
+<br><br>
 
  (4) 모델링 \
  ▶ 데이터셋 분리
